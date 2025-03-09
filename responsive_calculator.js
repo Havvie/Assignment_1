@@ -3,50 +3,84 @@ $(document).ready(function() {
     let operator = "";
     let previousInput = "";
 
-    // Function ot update the screen
-    function updateScreen(value) {
-        $('#screen').text(value);
+    // Select screen element to display calculations
+    const screen = $('#screen');
+
+    // Function to update the screen
+    function handleNumber(number) {
+        currentInput += number;
+        screen.text(currentInput);
     }
 
     // Handles button clicks
-    $(".btn").click(function() {
-        const value = $(this).data("value");
-        
-        // When equals buttons is selected, expression is evaluated
-        if (value === "=") {
-            try {
-                // Removes any non-mathematical characters
-                currentInput = currentInput.replace(/[^0-9+\-*/.]/g, "");
-                currentInput = eval(currentInput);
-                updateScreen(currentInput);
-            } catch (error) {
-                currentInput = "Error"; // Error for invalid expression
-                updateScreen(currentInput);
-            }
-        } else if(value === "C") {
-            // Clears the screen when 'C' is selected
-            currentInput = "";
-            updateScreen(currentInput);
-        } else {
-            // Checks if currentInput is 0, and resets if the user presses a number
-            if (currentInput === "0" && value !== "/" && value !== "*" && value !== "+" && value !== "-") {
-                currentInput = value;
-            } else {
-                // If it's an operatot, ensure we don't pass another opeator
-                if (["+", "-", "*", "/"].includes(value) && ["+","-","*","/"].includes(currentInput.slice(-1))) {
-                    return; // prevendings appending consectutive operators
-                } else {
-                    currentInput += value;
-                }
-            }
-            updateScreen(currentInput);
+    function handleOperator(op) {
+        if (currentInput === '') return;
+        if (previousInput !== '') {
+            calculate(); // Calculate the results first in order
         }
-    });
+        operator = op;
+        previousInput = currentInput;
+        currentInput = ''; // Clears current input for next number
+    }
 
-    // Hover effect to show button interaction
-    $(".btn").hover(function() {
-        $(this).css("background", "#666");
-    }, function() {
-        $(this).css("background", "#444");
+    // Function that clears input
+    function clearInput() {
+        currentInput = '';
+        previousInput = '';
+        operator = '';
+        screen.text('0');
+    }
+
+    // Function to calcuate the result
+    function calculate()  {
+        if (previousInput === '' || currentInput === '') return;
+        let result;
+        const prev = parseFloat(previousInput);
+        const current = parseFloat(currentInput);
+
+        switch (operator) {
+            case '+':
+                result = prev + current;
+                break;
+            case '-':
+                result = prev - current;
+                break;
+            case '*':
+                result = prev * current;
+                break;
+            case '/':
+                result = prev / current;
+                break;
+            default:
+                return;
+        }
+
+        currentInput = result.toString();
+        operator = '';
+        previousInput = '';
+        screen.text(currentInput);
+    }
+    // Function to handle the decimal point
+    function handleDecimal() {
+        // Only allows decimal if input doesn't already contain one
+        if (!currentInput.includes('.')) {
+            currentInput += '.';
+            screen.text(currentInput);
+        }
+    }
+    // Add event listeners for buttons using jQuery
+    $('.btn').click(function() {
+        const value = $(this).data('value');
+        if (value === 'C') {
+            clearInput();
+        } else if (value === '=') {
+            calculate(); // Calculate teh result when selecting '='
+        } else if (['+', '-', '*', '/'].includes(value)) {
+            handleOperator(value);
+        } else if (value === '.') {
+            handleDecimal(); // Handles decimal point
+        } else {
+            handleNumber(value);
+        }
     });
  });
