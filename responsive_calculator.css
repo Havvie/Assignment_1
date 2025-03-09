@@ -45,11 +45,14 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background 0.3s ease-in-out;
-    padding: 15px 0;
+    transition: background 0.3s ease-in-out, transform 0.3s ease;
+    padding: 15px 0; 
+    pointer-events: all; /* Ensure buttons can be clicked */
+    z-index: 1;
 }
 button:hover {
     background: #666;
+    transform: scale(1.1);
 }
 /* Smart Phones (Portrait & Landscape) */
 @media (max-width: 900px) {
@@ -57,7 +60,6 @@ button:hover {
         max-width: 95%;
     }
     .screen {
-        gap: 5px;
         font-size: 1.8em;
         height: 45px;
     }
